@@ -1,0 +1,2 @@
+language-tool-python>=2.2.1
+markovify>=0.8.0

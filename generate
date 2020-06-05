@@ -1,0 +1,45 @@
+#!/usr/bin/env python3
+"""
+Generate markov sentence based on text
+"""
+
+import argparse
+import markovify
+import language_tool_python
+
+
+def main(text_file):
+    """Main script where stuff happens."""
+
+    #Read text file
+    with open(text_file) as f:
+        text = f.read()
+
+    #Build markov model
+    text_model = markovify.Text(text)
+
+    #language check instance
+    tool = language_tool_python.LanguageTool('en-US')
+
+    #Create and check sentences until one passes language check
+    errors = 1
+    while (errors > 0):
+        sentence_attempt = text_model.make_short_sentence(280)
+        matches = tool.check(sentence_attempt)
+        errors = len(matches)
+        if errors == 0:
+            print(sentence_attempt)
+
+    #print(text_model.make_short_sentence(280))
+
+def _cli():
+    parser = argparse.ArgumentParser(
+            description=__doc__,
+            formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+            argument_default=argparse.SUPPRESS)
+    parser.add_argument('-t', '--text-file', help="Provide a text file reference")
+    args = parser.parse_args()
+    return vars(args)
+
+if __name__ == '__main__':
+    main(**_cli())
