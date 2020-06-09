@@ -6,29 +6,40 @@ Generate markov sentence based on text
 import argparse
 import markovify
 import language_tool_python
+from time import sleep
 
 
 def main(text_file):
     """Main script where stuff happens."""
 
     #Read text file
-    with open(text_file) as f:
-        text = f.read()
+#    with open(text_file) as f:
+#        text = f.read()
+#
+#    #Build markov model
+#    text_model = markovify.Text(text)
 
-    #Build markov model
-    text_model = markovify.Text(text)
+
+    with open(text_file) as f:
+        text_model = markovify.Text(f, retain_original=False)
+
 
     #language check instance
     tool = language_tool_python.LanguageTool('en-US')
 
     #Create and check sentences until one passes language check
     errors = 1
-    while (errors > 0):
+    is_relevant = False
+    while (errors > 0) & (is_relevant == False):
+        is_relevant = False
         sentence_attempt = text_model.make_short_sentence(280)
         matches = tool.check(sentence_attempt)
         errors = len(matches)
-        if errors == 0:
+        if "missile" in sentence_attempt.lower():
+            is_relevant = True
+        if (errors == 0) & (is_relevant == True):
             print(sentence_attempt)
+        sleep(0.05)
 
     #print(text_model.make_short_sentence(280))
 
